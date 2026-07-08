@@ -1,8 +1,8 @@
 import { connect } from 'cloudflare:sockets';
 
 // --- 配置项 ---
-const authToken = 'f64bdc57-0f54-4705-bf75-cfd646d98c06';
-const fallbackAddress = 'ProxyIP.SG.CMLiussss.net:443'; // 默认出口反代 IP
+const authToken = 'b27082fd-baaf-4bcd-8f80-9cf1cc0b5ba2';
+const fallbackAddress = 'ProxyIP.JP.CMLiussss.net:443'; // 默认出口反代 IP
 const customPath = ''; // 自定义路径（留空则使用UUID路径）
 const githubPreferredURL = 'https://raw.githubusercontent.com/qwer-search/bestip/refs/heads/main/kejilandbestip.txt';
 const enableGitHubPreferred = true;
