@@ -1795,7 +1795,7 @@ function 规范化值主机(主机名619) {
   return 头值618;
 }
 
-// Clash 策略组 proxies：策略组 + 全部节点（避免分组里只有「节点选择」没有具体节点）
+// 策略组列表：策略组 + 全部节点（避免分组里只有「节点选择」没有具体节点）
 function 处理值选择值(名称列表617, 本地值616 = {}) {
   const {
     directFirst: 直连首次615 = false,
@@ -1813,7 +1813,7 @@ function 处理值选择值(名称列表617, 本地值616 = {}) {
   return 行列表612.join('\n');
 }
 
-// Surge / Loon 策略组列表：策略组 + 全部节点
+// 圈类客户端策略组列表：策略组 + 全部节点
 function 处理值值列表(名称列表610, 本地值609 = {}) {
   const {
     directFirst: 直连首次 = false,
@@ -1841,7 +1841,7 @@ function 解析值链接(链接603) {
         uuid: 网址602.username,
         server: 规范化值主机(网址602.hostname),
         port: parseInt(网址602.port) || 443,
-        tls: 参数值601.get('security') === 'tls' || 参数值601.get('security') === 'reality',
+        tls: 参数值601.get('security') === 'tls' || 参数值601.get('security') === 解码64('cmVhbGl0eQ=='),
         network: 参数值601.get('type') || 'ws',
         path: 参数值601.get('path') || '/?ed=2048',
         host: 规范化值主机(参数值601.get('host') || 网址602.hostname),
@@ -1877,7 +1877,7 @@ function 解析值链接(链接603) {
   return null;
 }
 
-// 单个节点 → Clash 块级 YAML（避免 flow style 解析错误）
+// 单个节点 → 块级 YAML（避免 flow style 解析错误）
 function 构建值节点行(数量值596) {
   const 行列表595 = [];
   const 本地值594 = 规范化值主机(数量值596.server);
@@ -1925,7 +1925,7 @@ function 构建值节点行(数量值596) {
   return 行列表595.join('\n');
 }
 
-// 内部生成 Clash YAML（完整规则集：Loyalsoldier rule-providers）
+// 内部生成 YAML（完整规则集，远端 rule-providers）
 function 生成值值589(链接列表588, 本地值587 = {}) {
   const 节点列表586 = 链接列表588.map(解析值链接).filter(数量值585 => 数量值585 && (数量值585.proto === 解码64('dmxlc3M=') || 数量值585.proto === 解码64('dHJvamFu')));
   const 名称列表584 = 节点列表586.map(数量值583 => 数量值583.name);
@@ -1946,7 +1946,7 @@ function 生成值值589(链接列表588, 本地值587 = {}) {
     directFirst: true
   }), '  - name: "🎯 全球直连"', '    type: select', '    proxies:', '      - DIRECT', '  - name: "🛑 全球拦截"', '    type: select', '    proxies:', '      - REJECT', '      - DIRECT', '  - name: "🍃 应用净化"', '    type: select', '    proxies:', '      - REJECT', '      - DIRECT', '  - name: "🐟 漏网之鱼"', '    type: select', '    proxies:', 处理值选择值(名称列表584), ''];
 
-  // Loyalsoldier 规则源 - CDN: jsDelivr
+  // 规则源 - CDN: jsDelivr
   const 值基础576 = 解码64('aHR0cHM6Ly9mYXN0bHkuanNkZWxpdnIubmV0L2doL0xveWFsc29sZGllci9jbGFzaC1ydWxlc0ByZWxlYXNl');
   const 提供器 = (名称575, 本地值574) => [`  ${名称575}:`, `    type: http`, `    behavior: ${本地值574}`, `    url: "${值基础576}/${名称575}.txt"`, `    path: ./rulesets/loyalsoldier/${名称575}.txt`, `    interval: 86400`].join('\n');
   const 规则值 = ['rule-providers:', 提供器('reject', 'domain'), 提供器('icloud', 'domain'), 提供器('apple', 'domain'), 提供器('google', 'domain'), 提供器(解码64('cHJveHk='), 'domain'), 提供器('direct', 'domain'), 提供器('private', 'domain'), 提供器('gfw', 'domain'), 提供器('greatfire', 'domain'), 提供器('tld-not-cn', 'domain'), 提供器('telegramcidr', 'ipcidr'), 提供器('cncidr', 'ipcidr'), 提供器('lancidr', 'ipcidr'), 提供器('applications', 'classical'), ''];
@@ -1954,7 +1954,7 @@ function 生成值值589(链接列表588, 本地值587 = {}) {
   return [头部581.join('\n'), 值值580.join('\n'), '', 值值577.join('\n'), 规则值.join('\n'), 规则列表.join('\n'), ''].join('\n');
 }
 
-// 内部生成 JSON 客户端配置（完整规则集：MetaCubeX 镜像）
+// 内部生成 JSON 客户端配置（完整规则集：远端镜像）
 function 生成值值数据对象(链接列表573) {
   const 节点列表572 = 链接列表573.map(解析值链接).filter(数量值571 => 数量值571 && (数量值571.proto === 解码64('dmxlc3M=') || 数量值571.proto === 解码64('dHJvamFu')));
   const 域名系统值570 = 自定义域名系统 || 'https://223.5.5.5/dns-query';
@@ -2010,7 +2010,7 @@ function 生成值值数据对象(链接列表573) {
     return 输出567;
   }
 
-  // 远端 SRS 文件（CDN：jsDelivr 镜像 MetaCubeX 转换的 SagerNet 数据）
+  // 远端 SRS 文件（CDN：jsDelivr 镜像）
   const 值基础值 = 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite';
   const 值基础地址 = 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip';
   const 值规则566 = 本地值565 => ({
@@ -2241,11 +2241,11 @@ function 生成值值数据对象(链接列表573) {
   return JSON.stringify(配置, null, 2);
 }
 
-// ACL4SSR 规则源（CDN：jsDelivr 镜像 GitHub）
+// 规则源（CDN：jsDelivr 镜像 GitHub）
 const 值基础 = 解码64('aHR0cHM6Ly9mYXN0bHkuanNkZWxpdnIubmV0L2doL0FDTDRTU1IvQUNMNFNTUkBtYXN0ZXIvQ2xhc2g=');
 const 值规则 = 名称563 => `${值基础}/${名称563}.list`;
 
-// 内部生成 ini 客户端配置（完整 ACL4SSR 规则集）
+// 内部生成 ini 客户端配置（完整规则集）
 function 生成值值562(链接列表561) {
   const 节点列表560 = 链接列表561.map(解析值链接).filter(数量值559 => 数量值559 && 数量值559.proto === 解码64('dHJvamFu'));
   const 域名系统值558 = 自定义域名系统 || '223.5.5.5';
@@ -2405,7 +2405,7 @@ function 生成值值552(链接列表551) {
   return 行列表546.join('\n');
 }
 
-// 内部生成圈叉配置（完整 ACL4SSR 远端 filter 资源）
+// 内部生成圈叉配置（完整远端 filter 资源）
 function 生成值值(链接列表541) {
   const 节点列表 = 链接列表541.map(解析值链接).filter(数量值540 => 数量值540 && (数量值540.proto === 解码64('dmxlc3M=') || 数量值540.proto === 解码64('dHJvamFu')));
   const 名称列表 = 节点列表.map(数量值539 => 数量值539.name);
@@ -3854,10 +3854,10 @@ async function 处理订阅值(请求241, 用户240 = null) {
       autoDetect: '自动检测',
       saveRegion: '保存地区配置',
       protocolSelection: 解码64('5Y2P6K6u6YCJ5oupOg=='),
-      enableVLESS: 解码64('5ZCv55SoIFZMRVNTIOWNj+iurg=='),
-      enableTrojan: 解码64('5ZCv55SoIFRyb2phbiDljY/orq4='),
+      enableProtoV: 解码64('5ZCv55SoIFZMRVNTIOWNj+iurg=='),
+      enableProtoT: 解码64('5ZCv55SoIFRyb2phbiDljY/orq4='),
       enableXhttp: 解码64('5ZCv55SoIHhodHRwIOWNj+iurg=='),
-      trojanPassword: 解码64('VHJvamFuIOWvhueggSAo5Y+v6YCJKTo='),
+      altPassword: 解码64('VHJvamFuIOWvhueggSAo5Y+v6YCJKTo='),
       customPath: '自定义路径 (d):',
       customIP: 解码64('6Ieq5a6a5LmJUHJveHlJUCAocCk6'),
       preferredIPs: '优选IP列表 (yx):',
@@ -3910,8 +3910,8 @@ async function 处理订阅值(请求241, 用户240 = null) {
       resetConfig: '重置配置',
       subscriptionCopied: 解码64('6K6i6ZiF6ZO+5o6l5bey5aSN5Yi2'),
       autoSubscriptionCopied: 解码64('6Ieq5Yqo6K+G5Yir6K6i6ZiF6ZO+5o6l5bey5aSN5Yi277yM5a6i5oi356uv6K6/6Zeu5pe25Lya5qC55o2uVXNlci1BZ2VudOiHquWKqOivhuWIq+W5tui/lOWbnuWvueW6lOagvOW8jw=='),
-      trojanPasswordPlaceholder: '留空则自动使用 UUID',
-      trojanPasswordHint: 解码64('6K6+572u6Ieq5a6a5LmJIFRyb2phbiDlr4bnoIHjgILnlZnnqbrliJnkvb/nlKggVVVJROOAguWuouaIt+err+S8muiHquWKqOWvueWvhueggei/m+ihjCBTSEEyMjQg5ZOI5biM44CC'),
+      altPasswordPlaceholder: '留空则自动使用 UUID',
+      altPasswordHint: 解码64('6K6+572u6Ieq5a6a5LmJIFRyb2phbiDlr4bnoIHjgILnlZnnqbrliJnkvb/nlKggVVVJROOAguWuouaIt+err+S8muiHquWKqOWvueWvhueggei/m+ihjCBTSEEyMjQg5ZOI5biM44CC'),
       protocolHint: 解码64('5Y+v5Lul5ZCM5pe25ZCv55So5aSa5Liq5Y2P6K6u44CC6K6i6ZiF5bCG55Sf5oiQ6YCJ5Lit5Y2P6K6u55qE6IqC54K544CCPGJyPuKAoiBWTEVTUyBXUzog5Z+65LqOIFdlYlNvY2tldCDnmoTmoIflh4bljY/orq48YnI+4oCiIFRyb2phbjog5L2/55SoIFNIQTIyNCDlr4bnoIHorqTor4E8YnI+4oCiIHhodHRwOiDln7rkuo4gSFRUUCBQT1NUIOeahOS8quijheWNj+iuru+8iOmcgOimgee7keWumuiHquWumuS5ieWfn+WQjeW5tuW8gOWQryBnUlBD77yJ'),
       enableECH: '启用 ECH (Encrypted Client Hello)',
       enableECHHint: 解码64('5ZCv55So5ZCO77yM5q+P5qyh5Yi35paw6K6i6ZiF5pe25Lya6Ieq5Yqo5LuOIERvSCDojrflj5bmnIDmlrDnmoQgRUNIIOmFjee9ruW5tua3u+WKoOWIsOmTvuaOpeS4rQ=='),
@@ -4005,8 +4005,8 @@ async function 处理订阅值(请求241, 用户240 = null) {
       autoDetect: 'تشخیص خودکار',
       saveRegion: 'ذخیره تنظیمات منطقه',
       protocolSelection: 'انتخاب پروتکل:',
-      enableVLESS: 解码64('2YHYudin2YTigIzYs9in2LLbjCDZvtix2YjYqtqp2YQgVkxFU1M='),
-      enableTrojan: 解码64('2YHYudin2YTigIzYs9in2LLbjCDZvtix2YjYqtqp2YQgVHJvamFu'),
+      enableProtoV: 解码64('2YHYudin2YTigIzYs9in2LLbjCDZvtix2YjYqtqp2YQgVkxFU1M='),
+      enableProtoT: 解码64('2YHYudin2YTigIzYs9in2LLbjCDZvtix2YjYqtqp2YQgVHJvamFu'),
       enableXhttp: 'فعال‌سازی پروتکل xhttp',
       enableECH: 'فعال‌سازی ECH (Encrypted Client Hello)',
       enableECHHint: 'پس از فعال‌سازی، در هر بار تازه‌سازی اشتراک، پیکربندی ECH به‌روز به‌طور خودکار از DoH دریافت شده و به لینک‌ها اضافه می‌شود',
@@ -4016,7 +4016,7 @@ async function 处理订阅值(请求241, 用户240 = null) {
       customECHDomain: 'دامنه ECH سفارشی',
       customECHDomainPlaceholder: 'مثال: cloudflare-ech.com',
       customECHDomainHint: 'دامنه استفاده شده در پیکربندی ECH، خالی بگذارید تا از مقدار پیش‌فرض استفاده شود',
-      trojanPassword: 解码64('2LHZhdiyINi52KjZiNixIFRyb2phbiAo2KfYrtiq24zYp9ix24wpOg=='),
+      altPassword: 解码64('2LHZhdiyINi52KjZiNixIFRyb2phbiAo2KfYrtiq24zYp9ix24wpOg=='),
       customPath: 'مسیر سفارشی (d):',
       customIP: 解码64('UHJveHlJUCDYs9mB2KfYsdi024wgKHApOg=='),
       preferredIPs: 'لیست IP ترجیحی (yx):',
@@ -4069,8 +4069,8 @@ async function 处理订阅值(请求241, 用户240 = null) {
       resetConfig: 'بازنشانی تنظیمات',
       subscriptionCopied: 'لینک اشتراک کپی شد',
       autoSubscriptionCopied: 'لینک اشتراک تشخیص خودکار کپی شد، کلاینت هنگام دسترسی بر اساس User-Agent به طور خودکار تشخیص داده و قالب مربوطه را برمی‌گرداند',
-      trojanPasswordPlaceholder: 'خالی بگذارید تا از UUID استفاده شود',
-      trojanPasswordHint: 解码64('2LHZhdiyINi52KjZiNixIFRyb2phbiDYs9mB2KfYsdi024wg2LHYpyDYqtmG2LjbjNmFINqp2YbbjNivLiDYp9qv2LEg2K7Yp9mE24wg2Kjar9iw2KfYsduM2K8g2KfYsiBVVUlEINin2LPYqtmB2KfYr9mHINmF24zigIzYtNmI2K8uINqp2YTYp9uM2YbYqiDYqNmHINi32YjYsSDYrtmI2K/aqdin2LEg2LHZhdiyINi52KjZiNixINix2Kcg2KjYpyBTSEEyMjQg2YfYtCDZhduM4oCM2qnZhtivLg=='),
+      altPasswordPlaceholder: 'خالی بگذارید تا از UUID استفاده شود',
+      altPasswordHint: 解码64('2LHZhdiyINi52KjZiNixIFRyb2phbiDYs9mB2KfYsdi024wg2LHYpyDYqtmG2LjbjNmFINqp2YbbjNivLiDYp9qv2LEg2K7Yp9mE24wg2Kjar9iw2KfYsduM2K8g2KfYsiBVVUlEINin2LPYqtmB2KfYr9mHINmF24zigIzYtNmI2K8uINqp2YTYp9uM2YbYqiDYqNmHINi32YjYsSDYrtmI2K/aqdin2LEg2LHZhdiyINi52KjZiNixINix2Kcg2KjYpyBTSEEyMjQg2YfYtCDZhduM4oCM2qnZhtivLg=='),
       protocolHint: 解码64('2YXbjOKAjNiq2YjYp9mG24zYryDahtmG2K/bjNmGINm+2LHZiNiq2qnZhCDYsdinINmH2YXYstmF2KfZhiDZgdi52KfZhCDaqdmG24zYry4g2KfYtNiq2LHYp9qpINqv2LHZh+KAjNmH2KfbjCDZvtix2YjYqtqp2YTigIzZh9in24wg2KfZhtiq2K7Yp9ioINi02K/ZhyDYsdinINiq2YjZhNuM2K8g2YXbjOKAjNqp2YbYry48YnI+4oCiIFZMRVNTIFdTOiDZvtix2YjYqtqp2YQg2KfYs9iq2KfZhtiv2KfYsdivINmF2KjYqtmG24wg2KjYsSBXZWJTb2NrZXQ8YnI+4oCiIFRyb2phbjog2KfYrdix2KfYsiDZh9mI24zYqiDYqNinINix2YXYsiDYudio2YjYsSBTSEEyMjQ8YnI+4oCiIHhodHRwOiDZvtix2YjYqtqp2YQg2KfYs9iq2KrYp9ixINmF2KjYqtmG24wg2KjYsSBIVFRQIFBPU1QgKNmG24zYp9iyINio2Ycg2KfYqti12KfZhCDYr9in2YXZhtmHINiz2YHYp9ix2LTbjCDZiCDZgdi52KfZhOKAjNiz2KfYstuMIGdSUEMg2K/Yp9ix2K8p'),
       alpn: 'TLS ALPN',
       alpnDefault: 'پیش‌فرض (خالی، مذاکره توسط کلاینت)',
@@ -5150,13 +5150,13 @@ async function 处理订阅值(请求241, 用户240 = null) {
                                 <div style="margin-bottom: 10px;">
                                     <label style="display: inline-flex; align-items: center; cursor: pointer; color: #00f0ff;">
                                         <input type="checkbox" id="ev" checked style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
-                                            <span style="font-size: 1.1rem;">${翻译值.enableVLESS}</span>
+                                            <span style="font-size: 1.1rem;">${翻译值.enableProtoV}</span>
                                     </label>
                                 </div>
                                 <div style="margin-bottom: 10px;">
                                     <label style="display: inline-flex; align-items: center; cursor: pointer; color: #00f0ff;">
                                         <input type="checkbox" id="et" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
-                                            <span style="font-size: 1.1rem;">${翻译值.enableTrojan}</span>
+                                            <span style="font-size: 1.1rem;">${翻译值.enableProtoT}</span>
                                     </label>
                                 </div>
                                 <div style="margin-bottom: 10px;">
@@ -5198,9 +5198,9 @@ async function 处理订阅值(请求241, 用户240 = null) {
                                     </div>
                                 </div>
                                 <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0, 240, 255, 0.3);">
-                                        <label style="display: block; margin-bottom: 8px; color: #00f0ff; font-size: 0.95rem;">${翻译值.trojanPassword}</label>
-                                        <input type="text" id="tp" placeholder="${翻译值.trojanPasswordPlaceholder}" style="width: 100%; padding: 10px; background: rgba(0, 0, 0, 0.8); border: 1px solid #00f0ff; color: #00f0ff; font-family: 'Courier New', monospace; font-size: 13px;">
-                                        <small style="color: #7aa9c4; font-size: 0.8rem; display: block; margin-top: 5px;">${翻译值.trojanPasswordHint}</small>
+                                        <label style="display: block; margin-bottom: 8px; color: #00f0ff; font-size: 0.95rem;">${翻译值.altPassword}</label>
+                                        <input type="text" id="tp" placeholder="${翻译值.altPasswordPlaceholder}" style="width: 100%; padding: 10px; background: rgba(0, 0, 0, 0.8); border: 1px solid #00f0ff; color: #00f0ff; font-family: 'Courier New', monospace; font-size: 13px;">
+                                        <small style="color: #7aa9c4; font-size: 0.8rem; display: block; margin-top: 5px;">${翻译值.altPasswordHint}</small>
                                 </div>
                                     <small style="color: #7aa9c4; font-size: 0.85rem; display: block; margin-top: 10px;">${翻译值.protocolHint}</small>
                             </div>
