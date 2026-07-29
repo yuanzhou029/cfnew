@@ -3255,9 +3255,10 @@ async function 处理值值384(地址类型383, 主机, 端口数字, 原始数�
   const 实际代理已启用 = 请求代理配置 ? true : 是否代理已启用;
   const 值数据378 = 处理值值8数组(原始数据);
   async function 连接值发送(地址377, 端口376, 值代理 = false) {
-    const 远程值375 = 值代理 ? await 处理值代理连接(地址类型383, 地址377, 端口376, 实际代理配置) : await 连接值套接字(地址377, 端口376, 请求值379, 传输连接竞速数);
+    // 走代理时首包交给握手函数在释放写入器前发出，避免换写入器导致连接被重置
+    const 远程值375 = 值代理 ? await 处理值代理连接(地址类型383, 地址377, 端口376, 实际代理配置, 请求值379, 值数据378) : await 连接值套接字(地址377, 端口376, 请求值379, 传输连接竞速数);
     const 写入器374 = 远程值375.writable.getWriter();
-    if (值数据378.byteLength) await 写入器374.write(值数据378);
+    if (!值代理 && 值数据378.byteLength) await 写入器374.write(值数据378);
     return {
       remoteSock: 远程值375,
       writer: 写入器374
@@ -3766,10 +3767,10 @@ async function 处理值用户数据报(用户数据报块, 网页套接字, 值
     await 连接值279(值套接字, 网页套接字, 头部, null);
   } catch (错误263) {}
 }
-async function 处理值代理连接(地址类型, 地址262, 端口261, 代理配置 = 已解析代理5配置) {
+async function 处理值代理连接(地址类型, 地址262, 端口261, 代理配置 = 已解析代理5配置, 请求值258 = null, 首包数据 = null) {
   // 按代理种类分派：隧道走建隧请求，其余保持套接字5 握手
   if (代理配置 && (代理配置.kind === 代理种类_隧道 || 代理配置.kind === 代理种类_安全隧道)) {
-    return 处理值隧道连接(地址262, 端口261, 代理配置);
+    return 处理值隧道连接(地址262, 端口261, 代理配置, 请求值258, 首包数据);
   }
   const {
     username: 本地值260,
@@ -3777,46 +3778,75 @@ async function 处理值代理连接(地址类型, 地址262, 端口261, 代理�
     hostname: 主机名258,
     socksPort: 代理端口257
   } = 代理配置;
-  const 套接字256 = 连接({
-    hostname: 主机名258,
-    port: 代理端口257
-  });
+  // 优先用请求自带的 fetcher 建连，回退到全局连接
+  const 套接字256 = 处理打开值套接字(主机名258, 代理端口257, 请求值258);
   const 写入器255 = 套接字256.writable.getWriter();
   await 写入器255.write(new Uint8Array(本地值260 ? [5, 2, 0, 2] : [5, 1, 0]));
   const 读取器254 = 套接字256.readable.getReader();
-  let 本地值253 = (await 读取器254.read()).value;
+  // 响应可能分片到达，按需累积到足够长度再解析；残留字节留给下一步
+  let 残留字节 = new Uint8Array(0);
+  async function 读满(需要长度) {
+    while (残留字节.length < 需要长度) {
+      const { value: 分片, done: 已结束 } = await 读取器254.read();
+      if (已结束 || !分片) throw new Error(错误_代理连接失败);
+      残留字节 = 拼接值8数组(残留字节, 分片);
+    }
+    return 残留字节;
+  }
+  function 取走(长度) {
+    const 结果 = 残留字节.subarray(0, 长度);
+    残留字节 = 残留字节.subarray(长度);
+    return 结果;
+  }
+  let 本地值253 = await 读满(2);
   if (本地值253[0] !== 5 || 本地值253[1] === 255) throw new Error(错误_代理无可用方法);
-  if (本地值253[1] === 2) {
+  const 选中方法 = 本地值253[1];
+  取走(2);
+  if (选中方法 === 2) {
     if (!本地值260 || !密码259) throw new Error(错误_代理需要认证);
     const 编码器252 = new TextEncoder();
     const 认证请求 = new Uint8Array([1, 本地值260.length, ...编码器252.encode(本地值260), 密码259.length, ...编码器252.encode(密码259)]);
     await 写入器255.write(认证请求);
-    本地值253 = (await 读取器254.read()).value;
+    本地值253 = await 读满(2);
     if (本地值253[0] !== 1 || 本地值253[1] !== 0) throw new Error(错误_代理认证失败);
+    取走(2);
   }
+  // 统一用域名型寻址：调用方的地址类型编号在不同协议下含义不一致（值协议 2=域名，
+  // 木马协议 3=域名），按编号分支会把域名当成六版地址编错。交给代理自己解析更稳。
   const 编码器251 = new TextEncoder();
-  let 本地值250;
-  switch (地址类型) {
-    case 地址类型_四版:
-      本地值250 = new Uint8Array([1, ...地址262.split('.').map(Number)]);
-      break;
-    case 地址类型_网址:
-      本地值250 = new Uint8Array([3, 地址262.length, ...编码器251.encode(地址262)]);
-      break;
-    case 地址类型_六版:
-      本地值250 = new Uint8Array([4, ...地址262.split(':').flatMap(横值 => [parseInt(横值.slice(0, 2), 16), parseInt(横值.slice(2), 16)])]);
-      break;
-    default:
-      throw new Error(错误_无效地址类型);
-  }
+  const 目标字节 = 编码器251.encode(规范化目标地址(地址262));
+  const 本地值250 = new Uint8Array([3, 目标字节.length, ...目标字节]);
   await 写入器255.write(new Uint8Array([5, 1, 0, ...本地值250, 端口261 >> 8, 端口261 & 255]));
-  本地值253 = (await 读取器254.read()).value;
+  // 连接应答长度随绑定地址类型而变，先读固定的 4 字节头再按类型补齐
+  本地值253 = await 读满(4);
   if (本地值253[1] !== 0) throw new Error(错误_代理连接失败);
+  const 绑定地址类型 = 本地值253[3];
+  let 应答长度;
+  if (绑定地址类型 === 1) {
+    应答长度 = 10;
+  } else if (绑定地址类型 === 4) {
+    应答长度 = 22;
+  } else if (绑定地址类型 === 3) {
+    应答长度 = 7 + (await 读满(5))[4];
+  } else {
+    throw new Error(错误_代理响应异常);
+  }
+  await 读满(应答长度);
+  取走(应答长度);
+  // 首包必须在释放写入器之前发出，与握手共用同一个写入器
+  if (首包数据 && 首包数据.byteLength) await 写入器255.write(首包数据);
   写入器255.releaseLock();
   读取器254.releaseLock();
+  // 应答之后若已捎带目标数据，重新挂回流首部，避免丢首包
+  if (残留字节.length) return 包装残留套接字(套接字256, 残留字节);
   return 套接字256;
 }
-async function 处理值隧道连接(地址238值, 端口237值, 代理配置) {
+// 六版地址在域名型寻址里不带方括号
+function 规范化目标地址(地址234值) {
+  const 文本 = String(地址234值 || '');
+  return /^\[.*\]$/.test(文本) ? 文本.slice(1, -1) : 文本;
+}
+async function 处理值隧道连接(地址238值, 端口237值, 代理配置, 请求值236值 = null, 首包数据235值 = null) {
   const {
     username: 隧道用户,
     password: 隧道密码,
@@ -3824,12 +3854,16 @@ async function 处理值隧道连接(地址238值, 端口237值, 代理配置) {
     socksPort: 隧道端口,
     kind: 隧道种类
   } = 代理配置;
-  const 套接字 = 连接({
+  const 连接选项 = 隧道种类 === 代理种类_安全隧道 ? {
+    secureTransport: 'on',
+    allowHalfOpen: false
+  } : undefined;
+  const 目标参数 = {
     hostname: 隧道主机,
     port: 隧道端口
-  }, 隧道种类 === 代理种类_安全隧道 ? {
-    secureTransport: 'on'
-  } : undefined);
+  };
+  // 优先用请求自带的 fetcher 建连，回退到全局连接
+  const 套接字 = 请求值236值 && typeof 请求值236值.connect === 'function' ? (连接选项 === undefined ? 请求值236值.connect(目标参数) : 请求值236值.connect(目标参数, 连接选项)) : 连接(目标参数, 连接选项);
   if (套接字?.opened) await 套接字.opened;
   // IPv6 目标在请求行里要带方括号
   const 目标主机 = 地址238值.includes(':') && !/^\[.*\]$/.test(地址238值) ? `[${地址238值}]` : 地址238值;
@@ -3868,6 +3902,8 @@ async function 处理值隧道连接(地址238值, 端口237值, 代理配置) {
     if (!(状态码 >= 200 && 状态码 < 300)) throw new Error(错误_代理隧道失败);
     // 代理在头部之后可能已经捎带了目标数据，需要交还给下游
     const 残留数据 = 缓冲.subarray(头部结束);
+    // 首包在释放写入器之前发出
+    if (首包数据235值 && 首包数据235值.byteLength) await 写入器.write(首包数据235值);
     写入器.releaseLock();
     读取器.releaseLock();
     if (残留数据.byteLength) return 包装残留套接字(套接字, 残留数据);
