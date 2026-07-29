@@ -125,7 +125,7 @@
 | :--- | :--- | :--- |
 | `u` | 你的 UUID | 必需，用于访问订阅和配置界面 |
 | `p` | proxyip | 可选，自定义ProxyIP地址和端口，支持 IPv4/IPv6/域名。设置后 `wk` 地区匹配失效（互斥）。也可在节点 path 里单独指定 |
-| `s` | 你的SOCKS5地址 | 可选，格式：`user:pass@host:port` 或 `host:port`。也可在节点 path 里单独指定 |
+| `s` | 出站代理地址 | 可选。支持 SOCKS5 和 HTTP/HTTPS 代理，见下方「[出站代理](#出站代理)」。也可在节点 path 里单独指定 |
 | `d` | 自定义路径 | 可选，如 `/mypath` 或 `/path/to/sub`，不填用UUID路径。路径没 `/` 开头会自动补上 |
 | `wk` | 地区代码 | 可选，手动指定Worker地区，如 `SG`、`HK`、`US`、`JP`。设置 `p` 后此项失效（互斥）。也可在节点 path 里单独指定 |
 
@@ -243,6 +243,34 @@ v2.7开始提供，v2.9增强了筛选功能
   - `X-ECH-Debug`: 详细的调试信息
   - `X-ECH-Config-Length`: ECH 配置长度（成功时）
 
+#### 出站代理
+
+`s` 变量用来指定出站代理，所有出站流量都会从它走。支持两类协议，靠前缀区分：
+
+| 写法 | 走的协议 | 说明 |
+| :--- | :--- | :--- |
+| `host:port` | SOCKS5 | 不写前缀就是 SOCKS5，和以前一样 |
+| `socks5://host:port` | SOCKS5 | 显式写法，等价于上面 |
+| `http://host:port` | HTTP | 明文连代理，再发建隧请求 |
+| `https://host:port` | HTTPS | 连代理这一跳走 TLS，适合代理本身要求加密的场景 |
+
+带认证就在前面加 `用户名:密码@`：
+
+```
+user:pass@1.2.3.4:1080
+socks5://user:pass@1.2.3.4:1080
+http://user:pass@1.2.3.4:8080
+https://user:pass@proxy.example.com:8443
+```
+
+说明几点：
+
+- HTTP/HTTPS 代理的认证走 Basic，由 Worker 自动生成，不用自己拼。
+- 只有 `http://` 和 `https://` 可以省略端口，分别默认 80 和 443；SOCKS5 必须写端口。
+- 地址后面多写的路径会被忽略，`http://1.2.3.4:8080/xxx` 等同于 `http://1.2.3.4:8080`。
+- 代理必须支持隧道转发（也就是能代理任意 TCP）。只能转发网页请求的代理用不了。
+- 在节点 path 里单独指定时写法完全一样，如 `s=http://user:pass@host:8080`。
+
 #### 自定义路径（d变量）
 
 - 不用UUID当路径了，可以自己设置
@@ -293,7 +321,7 @@ v2.9.4 新增。在 VLESS/Trojan 分享链接的 `path` 字段里追加查询参
 | `p` | 覆盖 ProxyIP（支持带端口） | `p=1.1.1.1` 或 `p=1.2.3.4:8443` |
 | `wk` | 覆盖 Worker 地区 | `wk=jp`、`wk=us`、`wk=sg` |
 | `rm` | 关闭地区智能匹配 | `rm=no` |
-| `s` | 覆盖 SOCKS5 代理 | `s=user:pass@host:1080` |
+| `s` | 覆盖出站代理 | `s=user:pass@host:1080`、`s=http://user:pass@host:8080` |
 
 **优先级：path 参数 > KV/环境变量 > 自动检测**
 
@@ -310,8 +338,9 @@ path 示例：
 /?ed=2048&wk=jp
 /?ed=2048&wk=sg&rm=no
 
-# 指定 SOCKS5（可与 wk 搭配）
-/?ed=2048&s=user:pass@socks5.host:1080&wk=us
+# 指定出站代理（可与 wk 搭配）
+/?ed=2048&s=user:pass@proxy.host:1080&wk=us
+/?ed=2048&s=http://user:pass@proxy.host:8080&wk=us
 ```
 
 > 不在上表中的变量（如 `ev`、`et`、`yx` 等）属于订阅生成级配置，在 WebSocket 握手阶段已过路由，放在 path 里无效，仍需在环境变量或 KV 中设置。
